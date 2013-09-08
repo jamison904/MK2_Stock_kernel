@@ -1423,6 +1423,7 @@ static inline unsigned long exfat_hash(loff_t i_pos)
 static struct inode *exfat_iget(struct super_block *sb, loff_t i_pos) {
 	struct exfat_sb_info *sbi = EXFAT_SB(sb);
 	struct exfat_inode_info *info;
+	struct hlist_node *node;
 	struct hlist_head *head = sbi->inode_hashtable + exfat_hash(i_pos);
 	struct inode *inode = NULL;
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,9,0)
@@ -1705,7 +1706,7 @@ static int exfat_statfs(struct dentry *dentry, struct kstatfs *buf)
 		info.FreeClusters = info.NumClusters - info.UsedClusters;
 
 		if (p_fs->dev_ejected)
-			printk("[EXFAT] statfs on device is ejected\n");
+			return -EIO;
 	}
 
 	buf->f_type = sb->s_magic;
